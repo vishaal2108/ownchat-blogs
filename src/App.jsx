@@ -3,156 +3,166 @@ import Navbar from './components/Navbar';
 import BlogHero from './components/BlogHero';
 import FeaturedBlog from './components/FeaturedBlog';
 import BlogGrid from './components/BlogGrid';
-import Pagination from './components/Pagination';
 import SkeletonLoader from './components/SkeletonLoader';
 import EmptyState from './components/EmptyState';
 import ErrorState from './components/ErrorState';
 import Footer from './components/Footer';
 import { useBlogData } from './hooks/useBlogData';
 
+const COMMON_FILTERS = [
+  'All Articles',
+  'WhatsApp API',
+  'WhatsApp Automation',
+  'WhatsApp Marketing',
+  'WhatsApp Commerce',
+  'Customer Support',
+  'Integrations',
+  'Restaurant',
+  'Healthcare',
+  'Updates'
+];
+
+const FILTER_MAP = {
+  'All Articles': null,
+  'WhatsApp API': ['whatsapp api', 'whatsapp business api'],
+  'WhatsApp Automation': ['whatsapp automation', 'whatsapp automation for restaurants'],
+  'WhatsApp Marketing': ['whatsapp marketing', 'whatsapp marketing for restaurants', 'whatsapp marketing strategy'],
+  'WhatsApp Commerce': ['whatsapp commerce', 'shopify whatsapp integration', 'shopify whatsapp marketing'],
+  'Customer Support': ['customer support', 'whatsapp flow builder', 'whatsapp flow'],
+  'Integrations': ['petpooja integrations', 'instagram automation', 'whatsapp bookings & automation', 'appointment scheduling'],
+  'Restaurant': ['whatsapp marketing for restaurants', 'whatsapp automation for restaurants', 'restaurant marketing automation'],
+  'Healthcare': ['healthcare automation'],
+  'Updates': ['whatsapp updates', 'whatsapp business pricing', 'features']
+};
+
+const ITEMS_PER_PAGE = 8;
+
 export default function App() {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [selectedCategory, setSelectedCategory] = useState('All Articles');
+  const [selectedFilter, setSelectedFilter] = useState('All Articles');
   const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
 
-  // Fetch blogs dynamically using reusable custom hook
-  const {
-    blogs,
-    pagination,
-    loading,
-    error,
-    refetch
-  } = useBlogData(currentPage, 9);
+  const { blogs, loading, error, refetch } = useBlogData();
 
-  // Dynamically derive available categories from API blog data
-  const availableCategories = useMemo(() => {
-    const cats = new Set(['All Articles']);
-    if (blogs && Array.isArray(blogs)) {
-      blogs.forEach(b => {
-        if (b.category && typeof b.category === 'string' && b.category.trim() !== '') {
-          cats.add(b.category.trim());
-        }
-      });
-    }
-    return Array.from(cats);
-  }, [blogs]);
-
-  // Client-side filtering for search bar & category chips
+  // All blogs matching the active filter + search
   const filteredBlogs = useMemo(() => {
     if (!blogs || blogs.length === 0) return [];
 
     return blogs.filter((blog) => {
-      // Category filter
-      if (selectedCategory && selectedCategory !== 'All Articles') {
-        const cat = (blog.category || '').toLowerCase().trim();
-        const targetCat = selectedCategory.toLowerCase().trim();
-        if (!cat.includes(targetCat) && cat !== targetCat) {
-          return false;
-        }
+      if (selectedFilter !== 'All Articles') {
+        const targetNames = FILTER_MAP[selectedFilter] || [];
+        const blogCat = (blog.category || '').toLowerCase().trim();
+        const blogTags = (blog.tags || []).map(t => t.toLowerCase());
+        const matchesCat = targetNames.some(t => blogCat.includes(t));
+        const matchesTag = targetNames.some(t => blogTags.some(tag => tag.includes(t)));
+        if (!matchesCat && !matchesTag) return false;
       }
 
-      // Search query filter
       if (searchQuery.trim() !== '') {
-        const query = searchQuery.toLowerCase().trim();
-        const titleMatch = (blog.title || '').toLowerCase().includes(query);
-        const excerptMatch = (blog.content || '').toLowerCase().includes(query);
-        const authorMatch = (blog.authorName || '').toLowerCase().includes(query);
-        const categoryMatch = (blog.category || '').toLowerCase().includes(query);
-        if (!titleMatch && !excerptMatch && !authorMatch && !categoryMatch) {
-          return false;
-        }
+        const q = searchQuery.toLowerCase().trim();
+        const inTitle = (blog.title || '').toLowerCase().includes(q);
+        const inCat = (blog.category || '').toLowerCase().includes(q);
+        const inTags = (blog.tags || []).some(t => t.toLowerCase().includes(q));
+        const inContent = (blog.content || '').toLowerCase().includes(q);
+        if (!inTitle && !inCat && !inTags && !inContent) return false;
       }
 
       return true;
     });
-  }, [blogs, selectedCategory, searchQuery]);
+  }, [blogs, selectedFilter, searchQuery]);
 
-  // Handle category chip selection
-  const handleSelectCategory = (cat) => {
-    setSelectedCategory(cat);
+  // Pagination math
+  const totalPages = Math.max(1, Math.ceil(filteredBlogs.length / ITEMS_PER_PAGE));
+
+  // Featured only on page 1, All Articles, no search
+  const showFeatured = currentPage === 1 && selectedFilter === 'All Articles' && searchQuery.trim() === '' && filteredBlogs.length > 0;
+  const featuredBlog = showFeatured ? filteredBlogs[0] : null;
+
+  // For page 1 with featured: skip index 0 (featured), take next ITEMS_PER_PAGE
+  // For all other cases: slice normally
+  const pageBlogs = useMemo(() => {
+    if (showFeatured) {
+      const rest = filteredBlogs.slice(1);
+      const start = (currentPage - 1) * ITEMS_PER_PAGE;
+      return rest.slice(start, start + ITEMS_PER_PAGE);
+    }
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredBlogs.slice(start, start + ITEMS_PER_PAGE);
+  }, [filteredBlogs, currentPage, showFeatured]);
+
+  const handleSelectFilter = (filter) => {
+    setSelectedFilter(filter);
     setCurrentPage(1);
   };
 
-  // Handle search input change
   const handleSearchChange = (val) => {
     setSearchQuery(val);
     setCurrentPage(1);
   };
 
-  // Determine layout split between Featured Blog & Grid
-  const showFeaturedSection = currentPage === 1 && searchQuery.trim() === '' && filteredBlogs.length > 0;
-  const featuredArticle = showFeaturedSection ? filteredBlogs[0] : null;
-  const gridArticles = showFeaturedSection ? filteredBlogs.slice(1) : filteredBlogs;
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    // Scroll to grid top smoothly
+    const el = document.getElementById('blog-grid-top');
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: 'var(--bg-main)' }}>
-      {/* Sleek SaaS Header */}
       <Navbar />
 
-      {/* Hero Section */}
       <BlogHero
         searchQuery={searchQuery}
         onSearchChange={handleSearchChange}
-        selectedCategory={selectedCategory}
-        onSelectCategory={handleSelectCategory}
-        categories={availableCategories}
+        selectedCategory={selectedFilter}
+        onSelectCategory={handleSelectFilter}
+        categories={COMMON_FILTERS}
         totalBlogs={filteredBlogs.length}
         loading={loading}
       />
 
-      {/* Main Content Area */}
       <main style={{ flexGrow: 1, position: 'relative' }}>
         {loading ? (
-          /* 1. Loading State: Beautiful Shimmer Skeletons */
-          <SkeletonLoader count={6} showFeatured={currentPage === 1 && searchQuery === ''} />
+          <SkeletonLoader count={6} showFeatured={true} />
         ) : error ? (
-          /* 2. Error State: Professional connection error with Retry button */
-          <ErrorState
-            title="Synchronization Error"
-            message={error}
-            onRetry={refetch}
-          />
+          <ErrorState title="Connection Error" message={error} onRetry={refetch} />
         ) : filteredBlogs.length === 0 ? (
-          /* 3. Empty State: When API returns 0 blogs or filters match nothing */
           <EmptyState
-            title={searchQuery || selectedCategory !== 'All Articles' ? 'No Matching Articles' : 'No Publications Available Yet'}
+            title={searchQuery || selectedFilter !== 'All Articles' ? 'No Matching Articles' : 'No Articles Available'}
             message={
-              searchQuery || selectedCategory !== 'All Articles'
-                ? `We couldn't find any articles matching "${searchQuery || selectedCategory}". Try adjusting your keyword or reset topic filters.`
-                : 'The OwnChat intelligence database currently has no published articles for this tenant.'
+              searchQuery || selectedFilter !== 'All Articles'
+                ? `No articles found for "${searchQuery || selectedFilter}". Try another filter or clear search.`
+                : 'No articles are published yet.'
             }
             onReset={() => {
               setSearchQuery('');
-              setSelectedCategory('All Articles');
-              refetch();
+              setSelectedFilter('All Articles');
+              setCurrentPage(1);
             }}
           />
         ) : (
-          /* 4. Success State: Render Featured Blog + 3-Column Responsive Grid */
           <>
-            {showFeaturedSection && featuredArticle && (
-              <FeaturedBlog blog={featuredArticle} />
+            {showFeatured && featuredBlog && (
+              <FeaturedBlog blog={featuredBlog} />
             )}
 
-            {gridArticles.length > 0 && (
+            {/* Anchor for scroll-to-top on page change */}
+            <div id="blog-grid-top" />
+
+            {pageBlogs.length > 0 && (
               <BlogGrid
-                blogs={gridArticles}
-                selectedCategory={selectedCategory}
+                blogs={pageBlogs}
+                selectedCategory={selectedFilter}
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalCount={filteredBlogs.length}
+                onPageChange={handlePageChange}
               />
             )}
-
-            {/* Pagination Controls */}
-            <Pagination
-              currentPage={pagination.currentPage}
-              totalPages={pagination.totalPages}
-              totalCount={filteredBlogs.length}
-              onPageChange={(p) => setCurrentPage(p)}
-            />
           </>
         )}
       </main>
 
-      {/* Footer */}
       <Footer />
     </div>
   );

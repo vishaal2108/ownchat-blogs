@@ -4,18 +4,10 @@ import { normalizeBlog } from '../utils/getBlogFields';
 
 // OwnChat Organization ID — scopes API to OwnChat's own published blogs
 const OWNCHAT_ORG_ID = '6642fb25c319d086a687e9d8';
-
-// API base
 const API_BASE = 'https://api-blog.owncart.shop/blog';
 
-export function useBlogData(page = 1, limit = 9) {
+export function useBlogData() {
   const [blogs, setBlogs] = useState([]);
-  const [pagination, setPagination] = useState({
-    currentPage: page,
-    totalPages: 1,
-    limit: limit,
-    totalCount: 0
-  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -24,45 +16,31 @@ export function useBlogData(page = 1, limit = 9) {
     setError(null);
 
     try {
-      // POST with orgId — this is the exact call ownchat.app makes internally
+      // Fetch all blogs in one shot (limit=50 covers all 44 OwnChat blogs)
       const response = await axios.post(
-        `${API_BASE}/get-blog-for-user?page=${page}&limit=${limit}`,
+        `${API_BASE}/get-blog-for-user?page=1&limit=50`,
         { orgId: OWNCHAT_ORG_ID }
       );
 
-      const dataPayload = response?.data?.data || {};
-      const rawBlogs = dataPayload.blog || [];
-      const rawPagination = dataPayload.pagination || {};
-
-      const normalizedBlogs = rawBlogs.map((item, idx) => normalizeBlog(item, idx));
-      const totalCount = Number(rawPagination.totalCount || normalizedBlogs.length || 0);
-      const limitVal = Number(rawPagination.limit || limit);
-      const calculatedTotalPages = Math.max(1, Math.ceil(totalCount / limitVal));
+      const rawBlogs = response?.data?.data?.blog || [];
+      // Preserve raw tags array for display on cards
+      const normalizedBlogs = rawBlogs.map((item, idx) => ({
+        ...normalizeBlog(item, idx),
+        tags: Array.isArray(item.tag) ? item.tag.map(t => t.name).filter(Boolean) : []
+      }));
 
       setBlogs(normalizedBlogs);
-      setPagination({
-        currentPage: page,
-        totalPages: calculatedTotalPages,
-        limit: limitVal,
-        totalCount: totalCount
-      });
     } catch (err) {
       console.error('Failed to fetch blog data:', err);
-      setError('We encountered an error while communicating with our servers. Please check your connection and try again.');
+      setError('We encountered an error loading articles. Please try again.');
     } finally {
       setLoading(false);
     }
-  }, [page, limit]);
+  }, []);
 
   useEffect(() => {
     fetchBlogs();
   }, [fetchBlogs]);
 
-  return {
-    blogs,
-    pagination,
-    loading,
-    error,
-    refetch: fetchBlogs
-  };
+  return { blogs, loading, error, refetch: fetchBlogs };
 }
