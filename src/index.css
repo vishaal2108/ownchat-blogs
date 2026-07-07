@@ -1,0 +1,279 @@
+/* ==========================================================================
+   OwnChat Brand Design System - Sleek Dark Mode (SaaS Premium)
+   Derived strictly from color-palette.md & tailored for high-impact dark UI
+   ========================================================================== */
+
+:root {
+  /* 🎨 Primary Brand Colors */
+  --primary-blue: #0B74FF;
+  --primary-hover: #005FE8;
+  --dark-blue: #004CC2;
+  --primary-light: #338CFF;
+  --primary-lighter: #63A9FF;
+
+  /* 🌈 Primary & Alternate Gradients */
+  --primary-gradient: linear-gradient(135deg, #0B74FF 0%, #338CFF 50%, #63A9FF 100%);
+  --alt-hero-gradient: linear-gradient(135deg, #0066FF, #0B74FF, #58A6FF);
+  --cta-gradient: linear-gradient(135deg, #0066FF, #338CFF);
+
+  /* 🌑 Deep SaaS Dark Backgrounds */
+  --bg-main: #060911;
+  --bg-secondary: #0D121F;
+  --bg-feature-cards: #0C111D;
+  --bg-alternate: #0A0F1A;
+  --bg-soft-blue: rgba(11, 116, 255, 0.15);
+  --bg-footer: #04060B;
+
+  /* 📝 Clean Text Colors for Dark Theme */
+  --text-heading: #FFFFFF;
+  --text-secondary: #E2E8F0;
+  --text-paragraph: #94A3B8;
+  --text-muted: #64748B;
+  --text-white: #FFFFFF;
+
+  /* 📑 Border Colors */
+  --border-default: #1E293B;
+  --border-light: #162032;
+  --border-input: #334155;
+  --border-btn-secondary: #1E293B;
+
+  /* 🎯 Accent & Status Colors */
+  --accent-success: #22C55E;
+  --accent-warning: #F59E0B;
+  --accent-error: #EF4444;
+  --accent-info: #3B82F6;
+
+  /* 🧊 Card Design & Badges (Matching Screenshot Exactly) */
+  --card-bg: #0B0F19;
+  --card-border: #1E293B;
+  --card-radius: 24px;
+  --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  --card-hover-shadow: 0 20px 50px rgba(11, 116, 255, 0.22);
+  
+  --badge-bg: #0066FF;
+  --badge-text: #FFFFFF;
+  --date-text: #8899A6;
+
+  /* Typography */
+  --font-heading: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ==========================================================================
+   CSS Reset & Base Styles
+   ========================================================================== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--bg-main);
+  color: var(--text-paragraph);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  color: var(--text-heading);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: var(--transition-fast);
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+  border: none;
+  outline: none;
+  background: none;
+}
+
+button {
+  cursor: pointer;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-main);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-default);
+  border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* ==========================================================================
+   Layout & Utilities
+   ========================================================================== */
+.container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding: 0 2rem;
+  }
+}
+
+.section-padding {
+  padding: 4rem 0;
+}
+
+@media (min-width: 1024px) {
+  .section-padding {
+    padding: 5rem 0;
+  }
+}
+
+/* Glassmorphism utility for Dark Theme */
+.glass-panel {
+  background: rgba(13, 18, 31, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.dark-glass-panel {
+  background: rgba(6, 9, 17, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* ==========================================================================
+   Buttons & Interactive Tokens
+   ========================================================================== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border-radius: 12px;
+  transition: var(--transition-normal);
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: var(--primary-blue);
+  color: var(--text-white);
+  box-shadow: 0 4px 14px rgba(11, 116, 255, 0.3);
+}
+.btn-primary:hover {
+  background: var(--primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(11, 116, 255, 0.45);
+}
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+  color: var(--text-white);
+}
+.btn-secondary:hover {
+  background: var(--border-default);
+  border-color: var(--primary-light);
+  transform: translateY(-2px);
+}
+.btn-secondary:active {
+  transform: translateY(0);
+}
+
+.btn-sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  border-radius: 10px;
+}
+
+/* ==========================================================================
+   Badge Styles (Matching Screenshot Pill Badges)
+   ========================================================================== */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.38rem 0.9rem;
+  background-color: var(--badge-bg);
+  color: var(--badge-text);
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 9999px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: var(--transition-fast);
+}
+
+.badge:hover {
+  background-color: var(--primary-hover);
+}
+
+/* ==========================================================================
+   Animations & Keyframes
+   ========================================================================== */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Skeleton Loading Shimmer for Dark Theme */
+.skeleton-shimmer {
+  background: linear-gradient(90deg, #0D121F 25%, #1E293B 50%, #0D121F 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.8s infinite linear;
+  border-radius: 8px;
+}
