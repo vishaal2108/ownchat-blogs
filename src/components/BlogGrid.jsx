@@ -52,7 +52,7 @@ export default function BlogGrid({
         {/* 4-column card grid */}
         <div className="bg-grid">
           {blogs.map((blog) => (
-            <div key={blog.id} className="animate-fade-in">
+            <div key={blog.id} className="animate-fade-in" style={{ height: '100%' }}>
               <BlogCard blog={blog} />
             </div>
           ))}

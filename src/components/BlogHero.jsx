@@ -163,29 +163,30 @@ export default function BlogHero({
           </div>
 
           {/* Interactive Category Filter Chips */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', gap: '0.6rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
             {(categories || DEFAULT_CATEGORIES).map((cat) => {
               const isSelected = selectedCategory === cat || (cat === 'All Articles' && (!selectedCategory || selectedCategory === 'All Articles'));
+              const catIcons = {
+                'All Articles': '⚡',
+                'WhatsApp API': '🔗',
+                'WhatsApp Automation': '🤖',
+                'WhatsApp Marketing': '📣',
+                'WhatsApp Commerce': '🛒',
+                'Customer Support': '💬',
+                'Integrations': '🔌',
+                'Restaurant': '🍽️',
+                'Healthcare': '🏥',
+                'Updates': '🚀',
+              };
+              const icon = catIcons[cat] || '📄';
               return (
                 <button
                   key={cat}
                   onClick={() => onSelectCategory && onSelectCategory(cat)}
-                  style={{
-                    padding: '0.5rem 1.15rem',
-                    borderRadius: '9999px',
-                    fontSize: '0.82rem',
-                    fontWeight: '600',
-                    transition: 'var(--transition-fast)',
-                    background: isSelected ? 'var(--primary-blue)' : 'rgba(13, 18, 31, 0.7)',
-                    color: isSelected ? '#FFFFFF' : 'var(--text-secondary)',
-                    border: isSelected ? '1px solid var(--primary-blue)' : '1px solid var(--border-default)',
-                    boxShadow: isSelected ? '0 4px 15px rgba(11, 116, 255, 0.35)' : 'none',
-                    letterSpacing: '0.03em',
-                    textTransform: 'uppercase'
-                  }}
-                  className="category-chip"
+                  className={`category-chip ${isSelected ? 'category-chip--active' : ''}`}
                 >
-                  {cat}
+                  <span className="chip-icon">{icon}</span>
+                  <span className="chip-label">{cat}</span>
                 </button>
               );
             })}
@@ -200,11 +201,59 @@ export default function BlogHero({
           box-shadow: 0 0 0 3px rgba(11, 116, 255, 0.25), 0 10px 30px rgba(0, 0, 0, 0.5) !important;
         }
 
+        /* Modern category chips */
+        .category-chip {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.42rem;
+          padding: 0.45rem 1rem;
+          border-radius: 9999px;
+          font-size: 0.78rem;
+          font-weight: 600;
+          letter-spacing: 0.02em;
+          cursor: pointer;
+          background: rgba(13, 18, 31, 0.65);
+          color: var(--text-secondary);
+          border: 1px solid rgba(255,255,255,0.08);
+          backdrop-filter: blur(12px);
+          transition: all 0.22s cubic-bezier(0.16,1,0.3,1);
+          position: relative;
+          overflow: hidden;
+          white-space: nowrap;
+        }
+        .category-chip::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(135deg, rgba(11,116,255,0.15) 0%, transparent 60%);
+          opacity: 0;
+          transition: opacity 0.22s ease;
+          border-radius: inherit;
+        }
+        .category-chip:hover::before { opacity: 1; }
         .category-chip:hover {
-          background: ${searchQuery ? 'var(--primary-blue)' : 'rgba(11, 116, 255, 0.2)'} !important;
-          border-color: var(--primary-blue) !important;
-          color: #FFFFFF !important;
+          background: rgba(11,116,255,0.15);
+          border-color: rgba(11,116,255,0.45);
+          color: #fff;
           transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(11,116,255,0.2);
+        }
+        .category-chip--active {
+          background: var(--primary-blue) !important;
+          border-color: var(--primary-blue) !important;
+          color: #fff !important;
+          box-shadow: 0 4px 18px rgba(11,116,255,0.45),
+                      0 0 0 3px rgba(11,116,255,0.18) !important;
+          transform: translateY(-1px);
+        }
+        .category-chip--active::before { opacity: 0; }
+        .chip-icon {
+          font-size: 0.85rem;
+          line-height: 1;
+          flex-shrink: 0;
+        }
+        .chip-label {
+          line-height: 1;
         }
       `}</style>
     </section>

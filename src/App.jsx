@@ -76,19 +76,14 @@ export default function App() {
 
   // Featured only on page 1, All Articles, no search
   const showFeatured = currentPage === 1 && selectedFilter === 'All Articles' && searchQuery.trim() === '' && filteredBlogs.length > 0;
-  const featuredBlog = showFeatured ? filteredBlogs[0] : null;
+  // Featured slideshow always shows all filteredBlogs
+  const featuredBlogs = showFeatured ? filteredBlogs : [];
 
-  // For page 1 with featured: skip index 0 (featured), take next ITEMS_PER_PAGE
-  // For all other cases: slice normally
+  // Grid shows ITEMS_PER_PAGE starting from currentPage
   const pageBlogs = useMemo(() => {
-    if (showFeatured) {
-      const rest = filteredBlogs.slice(1);
-      const start = (currentPage - 1) * ITEMS_PER_PAGE;
-      return rest.slice(start, start + ITEMS_PER_PAGE);
-    }
     const start = (currentPage - 1) * ITEMS_PER_PAGE;
     return filteredBlogs.slice(start, start + ITEMS_PER_PAGE);
-  }, [filteredBlogs, currentPage, showFeatured]);
+  }, [filteredBlogs, currentPage]);
 
   const handleSelectFilter = (filter) => {
     setSelectedFilter(filter);
@@ -142,8 +137,8 @@ export default function App() {
           />
         ) : (
           <>
-            {showFeatured && featuredBlog && (
-              <FeaturedBlog blog={featuredBlog} />
+            {showFeatured && featuredBlogs.length > 0 && (
+              <FeaturedBlog blogs={featuredBlogs} />
             )}
 
             {/* Anchor for scroll-to-top on page change */}
