@@ -75,7 +75,7 @@ export default function BlogHero({
 
       <div className="container" style={{ position: 'relative', zIndex: 10 }}>
         <div style={{ maxWidth: '860px', margin: '0 auto', textAlign: 'center' }}>
-          
+
           {/* Top Pill Badge displaying Total Blog Count */}
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', padding: '0.45rem 1.1rem', background: 'rgba(11, 116, 255, 0.15)', backdropFilter: 'blur(12px)', borderRadius: '9999px', border: '1px solid rgba(11, 116, 255, 0.35)', marginBottom: '1.75rem', boxShadow: '0 4px 20px rgba(11, 116, 255, 0.15)' }}>
             <Sparkles size={16} style={{ color: '#63A9FF' }} />
@@ -201,54 +201,84 @@ export default function BlogHero({
           box-shadow: 0 0 0 3px rgba(11, 116, 255, 0.25), 0 10px 30px rgba(0, 0, 0, 0.5) !important;
         }
 
-        /* Modern category chips */
+        /* Modern 3D category chips */
         .category-chip {
           display: inline-flex;
           align-items: center;
-          gap: 0.42rem;
-          padding: 0.45rem 1rem;
+          gap: 0.5rem;
+          padding: 0.5rem 1.15rem;
           border-radius: 9999px;
-          font-size: 0.78rem;
+          font-size: 0.8rem;
           font-weight: 600;
           letter-spacing: 0.02em;
           cursor: pointer;
-          background: rgba(13, 18, 31, 0.65);
-          color: var(--text-secondary);
-          border: 1px solid rgba(255,255,255,0.08);
-          backdrop-filter: blur(12px);
-          transition: all 0.22s cubic-bezier(0.16,1,0.3,1);
+          
+          /* 3D Solid Base */
+          background: #1e222d; 
+          color: rgba(255, 255, 255, 0.85);
+          border: 1px solid rgba(255, 255, 255, 0.05);
+          
+          /* 3D Effect: Top highlight + thick bottom shadow for depth */
+          box-shadow: 
+            inset 0 2px 0 rgba(255, 255, 255, 0.1),
+            inset 0 -2px 0 rgba(0, 0, 0, 0.3),
+            0 4px 0 rgba(0, 0, 0, 0.6),
+            0 5px 10px rgba(0, 0, 0, 0.4);
+            
+          transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
           position: relative;
-          overflow: hidden;
           white-space: nowrap;
+          transform: translateY(0);
         }
-        .category-chip::before {
-          content: '';
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(135deg, rgba(11,116,255,0.15) 0%, transparent 60%);
-          opacity: 0;
-          transition: opacity 0.22s ease;
-          border-radius: inherit;
-        }
-        .category-chip:hover::before { opacity: 1; }
+        
         .category-chip:hover {
-          background: rgba(11,116,255,0.15);
-          border-color: rgba(11,116,255,0.45);
+          background: #252a36;
           color: #fff;
-          transform: translateY(-2px);
-          box-shadow: 0 6px 20px rgba(11,116,255,0.2);
+          transform: translateY(-1px);
+          box-shadow: 
+            inset 0 2px 0 rgba(255, 255, 255, 0.15),
+            inset 0 -2px 0 rgba(0, 0, 0, 0.3),
+            0 5px 0 rgba(0, 0, 0, 0.6),
+            0 8px 15px rgba(0, 0, 0, 0.5);
         }
+        
+        /* Pressed state when clicking */
+        .category-chip:active {
+          transform: translateY(3px) !important;
+          box-shadow: 
+            inset 0 2px 4px rgba(0, 0, 0, 0.4),
+            0 1px 0 rgba(0, 0, 0, 0.6) !important;
+        }
+
         .category-chip--active {
           background: var(--primary-blue) !important;
-          border-color: var(--primary-blue) !important;
+          border-color: transparent !important;
           color: #fff !important;
-          box-shadow: 0 4px 18px rgba(11,116,255,0.45),
-                      0 0 0 3px rgba(11,116,255,0.18) !important;
-          transform: translateY(-1px);
+          /* Blue 3D button for active */
+          box-shadow: 
+            inset 0 2px 0 rgba(255, 255, 255, 0.3),
+            inset 0 -2px 0 rgba(0, 0, 0, 0.2),
+            0 4px 0 #0050b3,
+            0 5px 15px rgba(11, 116, 255, 0.4) !important;
         }
-        .category-chip--active::before { opacity: 0; }
+        
+        .category-chip--active:hover {
+          box-shadow: 
+            inset 0 2px 0 rgba(255, 255, 255, 0.4),
+            inset 0 -2px 0 rgba(0, 0, 0, 0.2),
+            0 5px 0 #0050b3,
+            0 8px 20px rgba(11, 116, 255, 0.5) !important;
+        }
+
+        .category-chip--active:active {
+          transform: translateY(3px) !important;
+          box-shadow: 
+            inset 0 2px 5px rgba(0, 0, 0, 0.3),
+            0 1px 0 #0050b3 !important;
+        }
+
         .chip-icon {
-          font-size: 0.85rem;
+          font-size: 0.95rem;
           line-height: 1;
           flex-shrink: 0;
         }
